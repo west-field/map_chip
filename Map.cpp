@@ -4,6 +4,9 @@
 #include <cassert>
 #include "Pad.h"
 
+#include <iostream>
+#include <fstream>
+
 namespace
 {
 	//マップチップ1つのサイズ
@@ -12,6 +15,9 @@ namespace
 	//チップの数 バックグラウンド
 	constexpr int kBgNumX = Game::kScreenWidth / kChipSize;
 	constexpr int kBgNumY = Game::kScreenHeight / kChipSize;
+	
+	//入出力ファイル名
+	const char* const kFileName = "map.bin";
 
 	//マップデータ
 	constexpr int kMapData[kBgNumY][kBgNumX] =
@@ -71,6 +77,7 @@ void Map::update()
 	*/
 	if (Pad::isTrigger(PAD_INPUT_1))
 	{
+		//指定したマップチップの変更
 		if (m_mapData[m_cursorNo] < (chipNum() - 1))
 		{
 			m_mapData[m_cursorNo]++;
@@ -78,34 +85,41 @@ void Map::update()
 	}
 	if (Pad::isTrigger(PAD_INPUT_2))
 	{
+		//指定したマップチップの変更
 		if (m_mapData[m_cursorNo] > 0)
 		{
 			m_mapData[m_cursorNo]--;
 		}
 	}
+	if (Pad::isTrigger(PAD_INPUT_3))
+	{
+		//ファイルの出力
+		//outputData();
+		readData();
+	}
 
-	if (Pad::isPress(PAD_INPUT_UP))
+	if (Pad::isTrigger(PAD_INPUT_UP))
 	{
 		if (indexY > 0)
 		{
 			m_cursorNo -= kBgNumX;
 		}
 	}
-	if (Pad::isPress(PAD_INPUT_DOWN))
+	if (Pad::isTrigger(PAD_INPUT_DOWN))
 	{
 		if (indexY < (kBgNumY - 1))
 		{
 			m_cursorNo += kBgNumX;
 		}
 	}
-	if (Pad::isPress(PAD_INPUT_LEFT))
+	if (Pad::isTrigger(PAD_INPUT_LEFT))
 	{
 		if (indexX > 0)
 		{
 			m_cursorNo--;
 		}
 	}
-	if (Pad::isPress(PAD_INPUT_RIGHT))
+	if (Pad::isTrigger(PAD_INPUT_RIGHT))
 	{
 		if (indexX < (kBgNumX - 1))
 		{
@@ -157,4 +171,36 @@ int Map::chipNumY()
 int Map::chipNum()
 {
 	return (chipNumX() * chipNumY());
+}
+
+void Map::outputData()
+{
+	std::ofstream ofs(kFileName, std::ios::binary);
+
+//	std::ofstream ofs(kFileName); kFileName = "map.txt"
+// ofs << "test"
+	//ファイルのオープンに失敗
+	if (!ofs)
+	{
+		return;
+	}
+	//書き込み　書き込むデータの先頭アドレス　サイズ
+	ofs.write(reinterpret_cast<char*>(m_mapData.data()),sizeof(int) * kBgNumX * kBgNumY);
+
+	ofs.close();
+}
+void Map::readData()
+{
+	std::ifstream ifs(kFileName, std::ios::binary);
+
+	//ファイルの読み込みに失敗
+	if (!ifs)
+	{
+		return;
+	}
+
+	//読み込み　読み込む場所の先頭アドレス　サイズ
+	ifs.read(reinterpret_cast<char*>(m_mapData.data()), sizeof(int) * kBgNumX * kBgNumY);
+
+	ifs.close();
 }
