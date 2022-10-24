@@ -19,7 +19,8 @@ void SceneTest::end()
 
 SceneBase* SceneTest::update()
 {
-	
+	m_map.update();
+
 	return this;
 }
 
