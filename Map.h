@@ -18,6 +18,8 @@ public:
 	void draw();
 
 private:
+	//マップの描画
+	void drawMap(int offsetX,int offsetY);
 	//マップチップ編集用のカーソルを表示
 	void drawCursor();
 
@@ -41,6 +43,7 @@ private:
 	int m_cursorNo;
 	std::vector<int> m_mapData;
 
-
-	int m_waitFrame;
+	//スクロールする
+	int m_scrollX;
+	int m_scrollY;
 };
